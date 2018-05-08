@@ -1,0 +1,4 @@
+numpy
+mxnet-cu90
+matplotlib
+pillow
