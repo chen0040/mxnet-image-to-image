@@ -1,6 +1,9 @@
 # mxnet-image-to-image
 
-Image to Image translation using MXNet and GAN
+This project compares two different GAN models for Image to Image translation using MXNet
+
+* Deep Convolution GAN with image auto-encoder
+* Pixel-to-Pixel GAN
 
 ### Pixel-to-Pixel GAN
 
