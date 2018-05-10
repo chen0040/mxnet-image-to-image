@@ -63,10 +63,9 @@ def inverted_transform(img):
     return ((img.as_in_context(mx.cpu()) * rgb_std + rgb_mean) * 255).transpose((1, 2, 0))
 
 
-def load_vgg16_image(img_path, image_width=224, image_height=224):
+def load_vgg16_image(img_path):
     x = image.imread(img_path)
-    x = image.resize_short(x, 256)
-    x, _ = image.center_crop(x, (image_width, image_height))
+    x = image.imresize(x, 224, 224)
     return x
 
 
@@ -77,8 +76,8 @@ class Vgg16FeatureExtractor(object):
         self.image_net = models.vgg16(pretrained=True)
         self.image_net.collect_params().reset_ctx(ctx=model_ctx)
 
-    def extract_image_features(self, image_path, image_width=224, image_height=224):
-        img = load_vgg16_image(image_path, image_width=image_width, image_height=image_height)
-        img = transform(img).expand_dims(axis=0)
+    def extract_image_features(self, image_path):
+        img = load_vgg16_image(image_path)
+        img = transform(img, target_ht=224, target_wd=224).expand_dims(axis=0)
         img = img.as_in_context(self.model_ctx)
         return self.image_net(img)

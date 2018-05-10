@@ -78,7 +78,7 @@ class Discriminator(nn.Block):
 
 class DCGan(object):
 
-    model_name = 'dcgan-v2'
+    model_name = 'dcgan-v1'
 
     def __init__(self, model_ctx=mx.cpu(), data_ctx=mx.cpu()):
         self.netG = None
@@ -159,13 +159,16 @@ class DCGan(object):
 
         img_in_list = []
         img_out_list = []
-        for source_img_path, target_img_path in image_pairs:
-            source_img = load_vgg16_image(source_img_path)
+        total_pairs = len(image_pairs)
+        for i, (source_img_path, target_img_path) in enumerate(image_pairs):
+            logging.debug('extracting %d pair from %d pairs', i + 1, total_pairs)
+
             target_img = load_image(target_img_path, 64, 64)
-            source_img = nd.expand_dims(source_img, axis=0)
+            source_img = self.fe.extract_image_features(source_img_path)
             target_img = nd.expand_dims(target_img, axis=0)
             img_in_list.append(source_img)
             img_out_list.append(target_img)
+
         train_data = mx.io.NDArrayIter(data=[nd.concat(*img_out_list, dim=0), nd.concat(*img_in_list, dim=0)],
                                        batch_size=batch_size)
 

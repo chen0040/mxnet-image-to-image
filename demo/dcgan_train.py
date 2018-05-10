@@ -1,6 +1,7 @@
 import os
 import sys
 import mxnet as mx
+import logging
 
 
 def patch_path(path):
@@ -12,12 +13,14 @@ def main():
 
     output_dir_path = patch_path('models')
 
+    logging.basicConfig(level=logging.DEBUG)
+
     from mxnet_img_to_img.library.dcgan import DCGan
     from mxnet_img_to_img.data.facades_data_set import load_image_pairs
 
     img_pairs = load_image_pairs(patch_path('data/facades'))
     gan = DCGan(model_ctx=mx.gpu(0), data_ctx=mx.gpu(0))
-    gan.random_input_size = 50
+    gan.random_input_size = 24
     gan.img_width = 64  # default value is 256, too large for my graphics card memory
     gan.img_height = 64  # default value is 256, too large for my graphics card memory
 
