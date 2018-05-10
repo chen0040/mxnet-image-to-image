@@ -67,7 +67,7 @@ class Discriminator(nn.Block):
 
     def forward(self, x, *args):
         x1 = self.netD(x[0])
-        x1 = x1.reshape((x1.shape[0], 1000))
+        x1 = x1.reshape((x1.shape[0], 300))
         x2 = x[1]
         z = nd.concat(x1, x2, dim=1)
         # z = self.fc1(z)
@@ -152,10 +152,10 @@ class DCGan(object):
         self.netG.save_params(self.get_params_file_path(model_dir_path, 'netG'))
         self.netD.save_params(self.get_params_file_path(model_dir_path, 'netD'))
 
-    def fit(self, image_pairs, model_dir_path, epochs=2, batch_size=64, learning_rate=0.0002, beta1=0.5,
+    def fit(self, image_pairs, model_dir_path, epochs=100, batch_size=64, learning_rate=0.0002, beta1=0.5,
             image_pool_size=50,
             start_epoch=0,
-            print_every=10):
+            print_every=2):
 
         img_in_list = []
         img_out_list = []
@@ -220,12 +220,16 @@ class DCGan(object):
                     errD_real = loss(output, real_label)
                     metric.update([real_label, ], [output, ])
 
+                    logging.debug('ok1')
+
                     # train with fake image
                     output = self.netD(fake_concat)
                     errD_fake = loss(output, fake_label)
                     errD = errD_real + errD_fake
                     errD.backward()
                     metric.update([fake_label, ], [output, ])
+
+                    logging.debug('ok2')
 
                 trainerD.step(bsize)
 
@@ -236,7 +240,11 @@ class DCGan(object):
                     errG = loss(output, real_label)
                     errG.backward()
 
+                    logging.debug('ok3')
+
                 trainerG.step(bsize)
+
+                logging.debug('ok4')
 
                 # Print log infomation every ten batches
                 if iter % print_every == 0:
