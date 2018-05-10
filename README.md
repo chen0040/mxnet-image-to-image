@@ -2,8 +2,62 @@
 
 This project compares two different GAN models for Image to Image translation using MXNet
 
-* Deep Convolution GAN with image auto-encoder
-* Pixel-to-Pixel GAN
+* [dcgan.py](mxnet_img_to_img/library/dcgan.py): Deep Convolution GAN with image auto-encoder (in which the source 
+image is encoded using VGG16 feature extractor)
+* [pixel2pixel.py](mxnet_img_to_img/library/pixel2pixel.py): Pixel-to-Pixel GAN
+
+### Deep Convolution GAN with VGG16 source image encoder
+
+To run [DCGan](mxnet_img_to_img/library/dcgan.py) using 
+the [facade dataset](http://cmp.felk.cvut.cz/~tylecr1/facade/) dataset, run the following command:
+
+```bash
+python demo/dcgan_train.py
+```
+
+The [demo/dcgan_train.py](demo/dcgan_train.py) sample codes are shown below:
+
+```python
+import os
+import sys
+import mxnet as mx
+import logging
+
+
+def patch_path(path):
+    return os.path.join(os.path.dirname(__file__), path)
+
+
+def main():
+    sys.path.append(patch_path('..'))
+
+    output_dir_path = patch_path('models')
+
+    logging.basicConfig(level=logging.DEBUG)
+
+    from mxnet_img_to_img.library.dcgan import DCGan
+    from mxnet_img_to_img.data.facades_data_set import load_image_pairs
+
+    ctx = mx.cpu()
+    img_pairs = load_image_pairs(patch_path('data/facades'))
+    gan = DCGan(model_ctx=ctx)
+    gan.random_input_size = 24
+
+    gan.fit(image_pairs=img_pairs, model_dir_path=output_dir_path)
+
+
+if __name__ == '__main__':
+    main()
+```
+
+
+The trained models will be saved into [demo/models](demo/models) folder with prefix "dcgan-*"
+
+To run the trained models to generate new images:
+
+```bash
+python demo/dcgan_generate.py
+```
 
 ### Pixel-to-Pixel GAN
 
