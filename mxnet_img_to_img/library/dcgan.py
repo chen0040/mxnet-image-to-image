@@ -8,8 +8,7 @@ import numpy as np
 import time
 
 from mxnet_img_to_img.library.pool import ImagePool
-from mxnet_img_to_img.library.image_utils import save_image, inverted_transform, Vgg16FeatureExtractor, load_image, \
-    load_vgg16_image
+from mxnet_img_to_img.library.image_utils import save_image, inverted_transform, Vgg16FeatureExtractor, load_image
 
 
 def facc(label, pred):
@@ -220,16 +219,12 @@ class DCGan(object):
                     errD_real = loss(output, real_label)
                     metric.update([real_label, ], [output, ])
 
-                    logging.debug('ok1')
-
                     # train with fake image
                     output = self.netD(fake_concat)
                     errD_fake = loss(output, fake_label)
                     errD = errD_real + errD_fake
                     errD.backward()
                     metric.update([fake_label, ], [output, ])
-
-                    logging.debug('ok2')
 
                 trainerD.step(bsize)
 
@@ -240,11 +235,7 @@ class DCGan(object):
                     errG = loss(output, real_label)
                     errG.backward()
 
-                    logging.debug('ok3')
-
                 trainerG.step(bsize)
-
-                logging.debug('ok4')
 
                 # Print log infomation every ten batches
                 if iter % print_every == 0:
