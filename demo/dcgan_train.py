@@ -4,6 +4,9 @@ import mxnet as mx
 import logging
 
 
+LOAD_EXISTING_MODEL = False
+
+
 def patch_path(path):
     return os.path.join(os.path.dirname(__file__), path)
 
@@ -23,7 +26,10 @@ def main():
     gan = DCGan(model_ctx=ctx)
     gan.random_input_size = 24
 
-    gan.fit(image_pairs=img_pairs, model_dir_path=output_dir_path)
+    if LOAD_EXISTING_MODEL:
+        gan.load_model(output_dir_path)
+
+    gan.fit(image_pairs=img_pairs, model_dir_path=output_dir_path, epochs=100)
 
 
 if __name__ == '__main__':

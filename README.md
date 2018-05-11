@@ -59,6 +59,53 @@ To run the trained models to generate new images:
 python demo/dcgan_generate.py
 ```
 
+The [demo/dcgan_generate.py](demo/dcgan_train.py) sample codes are shown below:
+
+```python
+import os
+import sys
+import mxnet as mx
+from random import shuffle
+import numpy as np
+
+
+def patch_path(path):
+    return os.path.join(os.path.dirname(__file__), path)
+
+
+def main():
+    sys.path.append(patch_path('..'))
+    output_dir_path = patch_path('output')
+    model_dir_path = patch_path('models')
+
+    from mxnet_img_to_img.library.dcgan import DCGan
+    from mxnet_img_to_img.data.facades_data_set import load_image_pairs
+    from mxnet_img_to_img.library.image_utils import load_image, visualize, save_image
+
+    img_pairs = load_image_pairs(patch_path('data/facades'))
+
+    ctx = mx.cpu()
+    gan = DCGan(model_ctx=ctx)
+    gan.load_model(model_dir_path)
+
+    shuffle(img_pairs)
+
+    for i, (source_img_path, _) in enumerate(img_pairs[:20]):
+        source_img = load_image(source_img_path, 64, 64)
+        target_img = gan.generate(source_image_path=source_img_path, filename=str(i)+'.png', output_dir_path=output_dir_path)
+        img = mx.nd.concat(source_img.as_in_context(gan.model_ctx), target_img, dim=2)
+        visualize(img)
+        img = ((img.asnumpy().transpose(1, 2, 0) + 1.0) * 127.5).astype(np.uint8)
+        save_image(img, os.path.join(output_dir_path, DCGan.model_name + '-generated-' + str(i) + '.png'))
+
+
+if __name__ == '__main__':
+    main()
+
+```
+
+Below is some output images generated:
+
 ### Pixel-to-Pixel GAN
 
 To run [Pixel2PixelGan](mxnet_img_to_img/library/pixel2pixel.py) using 
@@ -151,6 +198,10 @@ def main():
 if __name__ == '__main__':
     main()
 ```
+
+# Comparison
+
+The Pixel2PixelGan outperforms the DCGan in terms of image translation quality.
 
 Below is some output images generated:
 
